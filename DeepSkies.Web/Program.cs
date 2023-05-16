@@ -17,3 +17,4 @@ app.MapGet("/hello", () => "world");
 app.MapGroup("/data").MapDeepSkyData();
 
 app.Run();
+

@@ -43,6 +43,7 @@ var exhibits = JsonDocument.Parse(database);
 var gallery = exhibits.RootElement.GetProperty("gallery");
 
 List<Exhibit> exhibitDb = new();
+List<Observatory> observatories = new();
 List<TargetType> targetTypes = new();
 List<Telescope> telescopes = new();
 List<Tag> tags = new();
@@ -171,6 +172,30 @@ foreach (JsonElement jsonExhibit in gallery.EnumerateArray())
         Tags = exhibitTags
     };
 
+    if (exhibit.Folder == "m13-florissant")
+    {
+        var obs = new Observatory
+        {
+            LocationLink = "http://ow.ly/xNKnj",
+            Observation = exhibit,
+            Username = "jeliknes"
+        };
+
+        observatories.Add(obs);
+    }
+
+    if (exhibit.Folder == "rho")
+    {
+        var obs = new Observatory
+        {
+            LocationLink = "http://goo.gl/maps/o0JxJ ",
+            Observation = exhibit,
+            Username = "jeliknes"
+        };
+
+        observatories.Add(obs);
+    }
+
     exhibitDb.Add(exhibit);    
 }
 
@@ -187,6 +212,7 @@ Console.WriteLine($"{exhibitDb.Count} exhibits, {targetTypes.Count} types, {tele
 context.Exhibits.AddRange(exhibitDb);
 context.TargetTypes.AddRange(targetTypes);
 context.Telescopes.AddRange(telescopes);
+context.Observatories.AddRange(observatories);
 context.SaveChanges();
 
 Console.SetCursorPosition(1, status + 3);

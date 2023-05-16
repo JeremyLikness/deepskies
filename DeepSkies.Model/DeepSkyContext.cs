@@ -11,6 +11,7 @@ namespace DeepSkies.Model
         public DbSet<Exhibit> Exhibits { get; set; }
         public DbSet<Telescope> Telescopes { get; set; }
         public DbSet<TargetType> TargetTypes { get; set; }
+        public DbSet<Observatory> Observatories { get; set; }
         public DbSet<Tag> Tags { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -34,6 +35,7 @@ namespace DeepSkies.Model
                 : new Declination(str));
 
             modelBuilder.Entity<Exhibit>().HasMany(e => e.Tags).WithMany();
+            modelBuilder.Entity<Observatory>().HasOne(o => o.Observation);
             
             base.OnModelCreating(modelBuilder);
         }
