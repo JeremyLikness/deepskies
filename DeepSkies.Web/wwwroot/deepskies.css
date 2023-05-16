@@ -1,0 +1,120 @@
+﻿body {
+    background: black;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: white;
+}
+
+#next, #prev {
+    font-size: 0.8em;
+    padding: 0.2em;
+    color: black;
+    background: gray;
+}
+
+#next:hover, #prev:hover {
+    background: lightgray;
+}
+
+#next:disabled, #prev:disabled {
+    color: lightgray;
+}
+
+h1 {
+    color: lightcoral;
+    margin: 1em;
+    border-bottom: 1px solid darkred;
+}
+
+h2 {
+    color: lightcyan;
+    margin: 1em;
+    border-bottom: 1px solid darkblue;
+}
+
+.float {
+    float: left;
+}
+
+button {
+    margin: .3em;
+    padding: .3em;    
+    border: solid 1px white;
+}
+
+button:hover {
+    background: gray;
+    border: solid 1px lightgreen;
+}
+
+button.current {
+    border: solid 1px gray;
+    font-weight: bold;
+    background: lightgreen;
+}
+
+#gallery {
+    width: 90vw;
+    margin-left: 5vw;
+    padding: 1em;
+}
+
+#loading {
+    position: fixed;
+    display: none;
+    padding-top: 30vh;
+    color: red;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(255,255,255,0.5);
+    font-size: 5em;
+    font-weight: bold;
+    text-align: center;
+}
+
+a {
+    color: lightblue;
+}
+
+.clickable {
+    cursor: pointer;
+}
+
+a:hover {
+    font-weight: bold;
+    text-decoration: none;
+}
+
+#detail {
+    cursor: pointer;
+    position: fixed;
+    display: none;
+    padding-top: 10vh;
+    padding-bottom: 10vh;
+    padding-left: 10vw;
+    padding-right: 10vw;
+    min-width: 30vw;
+    min-height: 30vh;
+    border: solid 2px gray;
+    background: rgba(0,0,0,0.8);
+}
+
+img {
+    margin-left: 22px;
+}
+
+.card {
+    border: solid 1px black;
+    text-align: center;
+    width: 300px;
+    max-height: 600px;
+    margin-left: 1em;
+    float: left;
+}
+
+.card:hover {
+    cursor: pointer;
+    border: solid 1px blue;
+    background: #330000;
+}

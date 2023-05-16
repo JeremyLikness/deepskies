@@ -1,0 +1,28 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Deep Skies</title>
+    <link rel="stylesheet" href="deepskies.css" />
+</head>
+<body>
+    <h1>Hello, Build! Welcome to Deep Skies.</h1>
+
+    <p><strong>Choose a type:</strong></p>
+    <div id="types"></div>
+
+    <p><strong>Choose a telescope:</strong></p>
+    <div id="telescopes"></div>
+
+    <p id="status"><strong>(No results)</strong></p>
+
+    <h2>Gallery:</h2>
+    <div id="loading">Loading...</div>
+    <div id="detail"></div>
+    <button id="prev">&laquo; Previous Page</button>&nbsp;
+    <button id="next">Next Page &raquo;</button>
+    <div id="gallery"></div>
+    <script src="gallery.js"></script>
+    <script>setTimeout(async () => await window.galleryApi.init());</script>
+</body>
+</html>
