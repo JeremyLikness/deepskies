@@ -4,6 +4,9 @@
 
     const domCtx = {
 
+        bindClick: (elem, callback) =>
+            elem.addEventListener("click", callback),
+
         createElement: (type, content) => {
 
             const elem = document.createElement(type);
@@ -25,41 +28,43 @@
             return elem;
         },
 
-        bindClick: (elem, callback) =>
-            elem.addEventListener("click", callback),
-
-        loadingReq: false,
-
         login: {
-            success: () => {
-                domCtx.login.area.textContent = "Welcome!";
-                domCtx.updateStatus("Successfully logged in.");
-            },
-            fail: () => {
-                domCtx.updateStatus("Login failed. Please try again!");
-            },
             area: document.querySelector("#login"),
             button: document.querySelector("#loginBtn"),
             username: document.querySelector("#username"),
             password: document.querySelector("#password"),
         },
 
-        prev: document.querySelector("#prev"),
+        disableBtn: btn => {
+            btn.setAttribute("disabled", "disabled");
+            btn.disabled = true;
+        },
 
-        next: document.querySelector("#next"),
+        dom: {
+            detail: document.querySelector("#detail"),
+            gallery: document.querySelector("#gallery"),
+            loading: document.querySelector("#loading"),
+            next: document.querySelector("#next"),
+            prev: document.querySelector("#prev"),
+            status: document.querySelector("#status"),
+            telescopes: document.querySelector("#telescopes"),
+            types: document.querySelector("#types"),
+        },
 
-        loading: document.querySelector("#loading"),
+        enableBtn: btn => {
+            btn.removeAttribute("disabled");
+            btn.disabled = false;
+        },
 
-        detail: document.querySelector("#detail"),
+        formValue: elem => elem.value,
 
-        toggleDetail: async (on, tgt) => {
-            domCtx.detail.innerHTML = "";
+        toggleDetail: async (on, target) => {
 
-            domCtx.detail.style.display = on ? "block" : "none";
+            domCtx.dom.detail.innerHTML = "";
+
+            domCtx.dom.detail.style.display = on ? "block" : "none";
 
             if (on) {
-
-                const target = await galleryCtx.getTarget(tgt.folder);
 
                 const date = target.lastCapture === target.firstCapture ?
                     target.firstCapture : `${target.firstCapture} - ${target.lastCapture}`;
@@ -102,11 +107,12 @@
                     emptyOrExposure = domCtx.createElement("p", `Exposure: ${e}s Subs: ${l} Total exposure: ${duration}`);
                 }
 
-                const checkLocation = domCtx.createElement("button",
+                const checkLocation = domCtx.createElement(
+                    "button",
                     "Observation location");
 
-                checkLocation.addEventListener(
-                    "click",
+                domCtx.bindClick(
+                    checkLocation,
                     () => galleryCtx.checkLocation());
 
                 const content = domCtx.createElement("div",
@@ -120,41 +126,38 @@
                             domCtx.createElement("p", spaceLoc),
                             checkLocation])
                     ]);
-                domCtx.detail.appendChild(content);
+                domCtx.dom.detail.appendChild(content);
             }
         },
 
-        status: document.querySelector("#status"),
-
-        types: document.querySelector("#types"),
-
-        telescopes: document.querySelector("#telescopes"),
-
-        gallery: document.querySelector("#gallery"),
+        updateText: (elem, text) => elem.textContent = text,
 
         init: () => {
 
-            domCtx.login.button.addEventListener("click", () => {
+            domCtx.bindClick(domCtx.login.button, () => {
                 galleryCtx.login(
-                    domCtx.login.username.val,
-                    domCtx.login.password.val
+                    domCtx.formValue(domCtx.login.username),
+                    domCtx.formValue(domCtx.login.password)
                 )
             });
 
-            domCtx.detail.addEventListener("click", () => {
+            domCtx.bindClick(domCtx.dom.detail, () => {
                 domCtx.toggleDetail(false);
             });
 
-            domCtx.next.addEventListener("click", () => {
-                if (domCtx.next.disabled) {
+            domCtx.bindClick(domCtx.dom.next, () => {
+
+                if (domCtx.dom.next.disabled) {
                     return;
                 }
+
                 galleryCtx.pageInfo.currentPage++;
                 galleryCtx.refresh();
             });
 
-            domCtx.prev.addEventListener("click", () => {
-                if (domCtx.prev.disabled) {
+            domCtx.bindClick(domCtx.dom.prev, () => {
+
+                if (domCtx.dom.prev.disabled) {
                     return;
                 }
                 galleryCtx.pageInfo.currentPage--;
@@ -164,27 +167,23 @@
 
         refresh: () => {
 
-            domCtx.gallery.innerHTML = "";
+            domCtx.dom.gallery.innerHTML = "";
 
             if (galleryCtx.pageInfo.currentPage > 0) {
-                domCtx.prev.removeAttribute("disabled");
-                domCtx.prev.disabled = false;
+                domCtx.enableBtn(domCtx.dom.prev);
             }
             else {
-                domCtx.prev.setAttribute("disabled", "disabled");
-                domCtx.prev.disabled = true;
+                domCtx.disableBtn(domCtx.dom.prev);
             }
 
             if (galleryCtx.pageInfo.currentPage < galleryCtx.pageInfo.totalPages) {
-                domCtx.next.removeAttribute("disabled");
-                domCtx.next.disabled = false;
+                domCtx.enableBtn(domCtx.dom.next);
             }
             else {
-                domCtx.next.setAttribute("disabled", "disabled");
-                domCtx.next.disabled = true;
+                domCtx.disableBtn(domCtx.dom.next);
             }
 
-            domCtx.gallery.appendChild(domCtx.createElement("p", [
+            domCtx.dom.gallery.appendChild(domCtx.createElement("p", [
                 domCtx.createElement("span",
                     `Sorting by ${galleryCtx.sort} in ${galleryCtx.sortDesc ? 'descending' : 'ascending'} order. Tap the title or date to change the sort.`),
                 domCtx.createElement("span",
@@ -200,11 +199,11 @@
 
                 const head = domCtx.createElement("strong", target.title);
                 head.classList.add("clickable");
-                head.addEventListener("click", () => galleryCtx.toggle("title"));
+                domCtx.bindClick(head, () => galleryCtx.toggle("title"));
 
                 const date = domCtx.createElement("p", target.firstCapture.substring(0, 10));
                 date.classList.add("click");
-                date.addEventListener("click", () => galleryCtx.toggle("date"));
+                domCtx.bindClick(date, () => galleryCtx.toggle("date"));
 
                 const div = domCtx.createElement("div", [
                     head,
@@ -212,18 +211,19 @@
                     date]);
 
                 div.classList.add("card");
-                ((target) => {
-                    img.addEventListener("click", () => {
+                ((t) => {
+                    domCtx.bindClick(img, async () => {
+                        const target = await galleryCtx.getTarget(t.folder);
                         domCtx.toggleDetail(true, target);
                     });
                 })(target);
 
-                domCtx.gallery.appendChild(div);
+                domCtx.dom.gallery.appendChild(div);
             });
         },
 
         set: (property, val) => {
-
+                
             const old = document.querySelector(`#${property} button.current`);
 
             if (old) {
@@ -252,29 +252,31 @@
                 const btn = document.createElement("button");
                 btn.textContent = list[idx];
 
-                (function (item) {
-                    btn.addEventListener("click", () => callback(item));
-                })(list[idx]);
+                (function (item, btn) {
+                    domCtx.bindClick(btn, () => callback(item));
+                })(list[idx], btn);
 
                 container.appendChild(btn);
             }
         },
 
-        updateStatus: msg => domCtx.status.textContent = msg,
+        updateStatus: msg => domCtx.dom.status.textContent = msg,
 
         updateLoading: () =>
-            domCtx.loading.style.display = domCtx.loadingReq ? "block" : "none",
+            domCtx.dom.loading.style.display = galleryCtx.loadingReq ? "block" : "none",
     };
 
     const galleryCtx = {
 
         target: {},
 
+        loadingReq: false,
+
         inflightRequest: set => {
-            if (set && domCtx.loadingReq) {
+            if (set && galleryCtx.loadingReq) {
                 return false;
             }
-            domCtx.loadingReq = set;
+            galleryCtx.loadingReq = set;
             setTimeout(domCtx.updateLoading, 100);
             return true;
         },
@@ -292,16 +294,26 @@
                         let url = await res.text();
                         url = url.substring(1, url.length - 1);
                         window.open(url);
+                        return;
                     }
-                    else {
+
+                    if (res.status === 401) {
                         domCtx.updateStatus("Location check failed. You must be logged in.");
+                        return;
                     }
+
+                    if (res.status === 404) {
+                        domCtx.updateStatus("No location exists for this observation.");
+                    }
+
+                    domCtx.updateStatus("An unknown error occurred.");
                 });
 
-           galleryCtx.inflightRequest(false);
+            galleryCtx.inflightRequest(false);
         },
-        
-        login: async () => {
+
+        login: async (username, password) => {
+
             if (!galleryCtx.inflightRequest(true)) {
                 return;
             }
@@ -312,20 +324,27 @@
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
-                    "username": domCtx.login.username.value,
-                    "password": domCtx.login.password.value
+                    "username": username,
+                    "password": password
                 })
             }).then(resp => {
                 if (resp.ok) {
-                    domCtx.login.success();
+                    galleryCtx.loginSuccess();
                 }
                 else {
-                    domCtx.updateStatus("Login failed.");
+                    galleryCtx.loginFail();
                 }
-            }, __ => {
-                domCtx.login.fail();
             });
             galleryCtx.inflightRequest(false);
+        },
+
+        loginSuccess: () => {
+            domCtx.updateText(domCtx.login.area, "Welcome!");
+            domCtx.updateStatus("Successfully logged in.");
+        },
+
+        loginFail: () => {
+            domCtx.updateStatus("Login failed. Please try again!");
         },
 
         getTarget: async folder => {
@@ -417,8 +436,8 @@
         galleryCtx.types = await fetch("/data/types").then(r => r.json());
         galleryCtx.telescopes = await fetch("/data/telescopes").then(r => r.json());
         domCtx.init();
-        domCtx.bind(galleryCtx.types, domCtx.types, galleryCtx.setType);
-        domCtx.bind(galleryCtx.telescopes, domCtx.telescopes, galleryCtx.setTelescope);
+        domCtx.bind(galleryCtx.types, domCtx.dom.types, galleryCtx.setType);
+        domCtx.bind(galleryCtx.telescopes, domCtx.dom.telescopes, galleryCtx.setTelescope);
         galleryCtx.inflightRequest(false);
         await galleryCtx.refresh();
     };

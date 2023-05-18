@@ -8,7 +8,7 @@ namespace DeepSkies.Web
     public static class DeepSkyPersonalData
     {
         public static IEndpointRouteBuilder MapDeepSkyPersonalData(this IEndpointRouteBuilder endpoints)
-        {
+        {   
             endpoints.MapGet(
                 "observation/{folder}", 
                 GetLocationLinkAsync)
@@ -29,5 +29,5 @@ namespace DeepSkies.Web
 
             return target == null ? TypedResults.NotFound() : TypedResults.Ok(target);
         }
-    }    
+    }       
 }

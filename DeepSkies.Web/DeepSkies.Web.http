@@ -1,0 +1,52 @@
+﻿@DeepSkies.Web_HostAddress = https://localhost:7092
+
+GET {{DeepSkies.Web_HostAddress}}/hello
+
+###
+
+GET {{DeepSkies.Web_HostAddress}}/data/types
+
+###
+
+GET {{DeepSkies.Web_HostAddress}}/data/telescopes
+
+###
+
+GET {{DeepSkies.Web_HostAddress}}/target/{folder}
+
+###
+
+GET {{DeepSkies.Web_HostAddress}}/data/targets/Nebula/Svbony sv503 70ED/20/0
+
+###
+
+GET {{DeepSkies.Web_HostAddress}}/personaldata/observation/m13-florissant
+
+###
+
+POST {{DeepSkies.Web_HostAddress}}/identity/register
+Content-Encoding: UTF-8
+Content-Type: application/json
+
+{
+  "username": "jeliknes",
+  "password": "S3cr3tBu1ldP455w0rd!"
+}
+
+###
+
+POST {{DeepSkies.Web_HostAddress}}/identity/login
+# @name tokenRequest
+Content-Encoding: UTF-8
+Content-Type: application/json
+
+{
+  "username": "jeliknes",
+  "password": "S3cr3tBu1ldP455w0rd!"
+}
+
+### Get private location
+@accessToken = {{tokenRequest.response.body.$.access_token}}
+# @name privateLocation
+GET {{DeepSkies.Web_HostAddress}}/personaldata/observation/m13-florissant
+Authorization: Bearer {{@accessToken}}
