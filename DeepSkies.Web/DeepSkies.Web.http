@@ -12,7 +12,7 @@ GET {{DeepSkies.Web_HostAddress}}/data/telescopes
 
 ###
 
-GET {{DeepSkies.Web_HostAddress}}/target/{folder}
+GET {{DeepSkies.Web_HostAddress}}/data/target/m51-ha
 
 ###
 
@@ -46,7 +46,7 @@ Content-Type: application/json
 }
 
 ### Get private location
-@accessToken = {{tokenRequest.response.body.$.access_token}}
+@accessToken = getThisFromPreviousCAllWithoutQuotes
 # @name privateLocation
-GET {{DeepSkies.Web_HostAddress}}/personaldata/observation/m13-florissant
-Authorization: Bearer {{@accessToken}}
+GET {{DeepSkies.Web_HostAddress}}/personaldata/observation/rho
+Authorization: Bearer {{accessToken}}

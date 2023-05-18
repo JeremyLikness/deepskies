@@ -7,7 +7,12 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "deepskies", "deepskies\deep
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DeepSkies.Model", "DeepSkies.Model\DeepSkies.Model.csproj", "{BA4BC4F1-203D-4973-A0D0-9366FAD732E6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DeepSkies.Web", "DeepSkies.Web\DeepSkies.Web.csproj", "{8F65BD8E-25C6-485B-B431-F317E78ECF56}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DeepSkies.Web", "DeepSkies.Web\DeepSkies.Web.csproj", "{8F65BD8E-25C6-485B-B431-F317E78ECF56}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution", "Solution", "{C996AE29-1136-4E99-A379-E184EC1823CE}"
+	ProjectSection(SolutionItems) = preProject
+		README.md = README.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
