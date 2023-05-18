@@ -89,13 +89,15 @@ a:hover {
 #detail {
     cursor: pointer;
     position: fixed;
+    left: 2em;
+    top: 2em;
     display: none;
-    padding-top: 10vh;
+    padding-top: 2em;
     padding-bottom: 10vh;
     padding-left: 10vw;
     padding-right: 10vw;
-    min-width: 30vw;
-    min-height: 30vh;
+    max-width: 80vw;
+    max-height: 80vh;
     border: solid 2px gray;
     background: rgba(0,0,0,0.8);
 }

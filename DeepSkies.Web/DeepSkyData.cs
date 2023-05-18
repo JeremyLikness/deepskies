@@ -1,4 +1,5 @@
 ﻿using DeepSkies.Model;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -8,18 +9,10 @@ namespace DeepSkies.Web
     {
         public static IEndpointRouteBuilder MapDeepSkyData(this IEndpointRouteBuilder endpoints)
         {
-            endpoints.MapGet("/types", (DeepSkyContext ctx) => ctx.TargetTypes.Select(t => t.Name)
-                .ToArray().Order());
-
-            endpoints.MapGet("/telescopes", (DeepSkyContext ctx) => ctx.Telescopes.Select(t => t.Name)
-                .ToArray().Order());
-
-            endpoints.MapGet("target/{folder}", async (DeepSkyContext ctx, string folder) =>
-            {
-                var target = await ctx.Exhibits.FindAsync(folder);                
-                return target == null ? Results.NotFound() : Results.Ok(target);
-            });                
-
+            endpoints.MapGet("/types", GetTypesAsync);
+            endpoints.MapGet("/telescopes", GetTelescopesAsync);
+            endpoints.MapGet("target/{folder}", GetTargetAsync);          
+                        
             endpoints.MapGet("/targets/{type}/{telescope}/{limit:int}/{page:int}",
                 async (DeepSkyContext ctx,
                 string type,
@@ -40,6 +33,24 @@ namespace DeepSkies.Web
                 });
 
             return endpoints;
+        }
+
+        private async static Task<Ok<string[]>> GetTypesAsync(DeepSkyContext ctx)
+            => TypedResults.Ok(
+                (await ctx.TargetTypes.OrderBy(t => t.Name).Select(t => t.Name).ToArrayAsync()));
+
+        private async static Task<Ok<string[]>> GetTelescopesAsync(DeepSkyContext ctx)
+            => TypedResults.Ok(
+                await ctx.Telescopes.OrderBy(t => t.Name).Select(t => t.Name).ToArrayAsync());
+
+        private async static Task<Results<Ok<Exhibit>, NotFound>> GetTargetAsync(
+            DeepSkyContext ctx,
+            string folder)
+        {
+            var target = await ctx.Exhibits.FindAsync(folder);
+            return target == null 
+                ? TypedResults.NotFound() 
+                : TypedResults.Ok(target);
         }
 
         private async static Task<IResult> GetExhibitsAsync(

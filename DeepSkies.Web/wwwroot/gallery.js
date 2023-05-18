@@ -25,7 +25,24 @@
             return elem;
         },
 
+        bindClick: (elem, callback) =>
+            elem.addEventListener("click", callback),
+
         loadingReq: false,
+
+        login: {
+            success: () => {
+                domCtx.login.area.textContent = "Welcome!";
+                domCtx.updateStatus("Successfully logged in.");
+            },
+            fail: () => {
+                domCtx.updateStatus("Login failed. Please try again!");
+            },
+            area: document.querySelector("#login"),
+            button: document.querySelector("#loginBtn"),
+            username: document.querySelector("#username"),
+            password: document.querySelector("#password"),
+        },
 
         prev: document.querySelector("#prev"),
 
@@ -85,6 +102,13 @@
                     emptyOrExposure = domCtx.createElement("p", `Exposure: ${e}s Subs: ${l} Total exposure: ${duration}`);
                 }
 
+                const checkLocation = domCtx.createElement("button",
+                    "Observation location");
+
+                checkLocation.addEventListener(
+                    "click",
+                    () => galleryCtx.checkLocation());
+
                 const content = domCtx.createElement("div",
                     [
                         domCtx.createElement("h3", finalDate.substring(0, 10)),
@@ -93,7 +117,8 @@
                         emptyOrExposure,
                         domCtx.createElement("div", [
                             domCtx.createElement("p", anchor),
-                            domCtx.createElement("p", spaceLoc)])
+                            domCtx.createElement("p", spaceLoc),
+                            checkLocation])
                     ]);
                 domCtx.detail.appendChild(content);
             }
@@ -108,6 +133,13 @@
         gallery: document.querySelector("#gallery"),
 
         init: () => {
+
+            domCtx.login.button.addEventListener("click", () => {
+                galleryCtx.login(
+                    domCtx.login.username.val,
+                    domCtx.login.password.val
+                )
+            });
 
             domCtx.detail.addEventListener("click", () => {
                 domCtx.toggleDetail(false);
@@ -236,6 +268,8 @@
 
     const galleryCtx = {
 
+        target: {},
+
         inflightRequest: set => {
             if (set && domCtx.loadingReq) {
                 return false;
@@ -245,11 +279,61 @@
             return true;
         },
 
+        checkLocation: async () => {
+
+            if (!galleryCtx.inflightRequest(true)) {
+                return;
+            }
+
+            await fetch(`/personaldata/observation/${galleryCtx.target.folder}`)
+                .then(async res => {
+                    if (res.ok) {
+                        domCtx.updateStatus("Location check succeeded. Launching...");
+                        let url = await res.text();
+                        url = url.substring(1, url.length - 1);
+                        window.open(url);
+                    }
+                    else {
+                        domCtx.updateStatus("Location check failed. You must be logged in.");
+                    }
+                });
+
+           galleryCtx.inflightRequest(false);
+        },
+        
+        login: async () => {
+            if (!galleryCtx.inflightRequest(true)) {
+                return;
+            }
+            await fetch('/identity/login?cookieMode=true', {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    "username": domCtx.login.username.value,
+                    "password": domCtx.login.password.value
+                })
+            }).then(resp => {
+                if (resp.ok) {
+                    domCtx.login.success();
+                }
+                else {
+                    domCtx.updateStatus("Login failed.");
+                }
+            }, __ => {
+                domCtx.login.fail();
+            });
+            galleryCtx.inflightRequest(false);
+        },
+
         getTarget: async folder => {
             if (galleryCtx.inflightRequest(true)) {
                 const result = await fetch(`/data/target/${folder}`)
                     .then(response => response.json());
                 galleryCtx.inflightRequest(false);
+                galleryCtx.target = result;
                 return result;
             }
         },
