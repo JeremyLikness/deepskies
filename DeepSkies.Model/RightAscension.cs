@@ -1,5 +1,8 @@
 ﻿namespace DeepSkies.Model
 {
+    /// <summary>
+    /// Represent right ascension in a class with properties for hour, minute, second, and degrees.
+    /// </summary>
     public class RightAscension
     {
         private double degrees;

@@ -5,6 +5,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace DeepSkies.Web
 {
+    /// <summary>
+    /// Handles requests for gallery items.
+    /// </summary>
     public static class DeepSkyData
     {
         public static IEndpointRouteBuilder MapDeepSkyData(this IEndpointRouteBuilder endpoints)
@@ -121,6 +124,7 @@ namespace DeepSkies.Web
             var total = await targets.CountAsync();
             var totalPages = (int)Math.Ceiling((double)total / limit);
 
+            // sending a snapshot back, more details can be requested with the /target/{folder} endpoint
             return Results.Ok(new
             {
                 TotalExhibits = total,

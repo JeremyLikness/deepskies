@@ -1,12 +1,15 @@
 ﻿(async (api) => {
 
+    // whatever the page size is. Optimizing for 1920x1080 and 4 works best.
     const pageSizeIsAlways = 4;
 
     const domCtx = {
 
+        // we do a lot of this
         bindClick: (elem, callback) =>
             elem.addEventListener("click", callback),
 
+        // smart enough to handle strings, arrays, and elements
         createElement: (type, content) => {
 
             const elem = document.createElement(type);
@@ -28,6 +31,7 @@
             return elem;
         },
 
+        // UI elements for login
         login: {
             area: document.querySelector("#login"),
             button: document.querySelector("#loginBtn"),
@@ -35,11 +39,13 @@
             password: document.querySelector("#password"),
         },
 
+        // disable it with attibutes and the DOM property
         disableBtn: btn => {
             btn.setAttribute("disabled", "disabled");
             btn.disabled = true;
         },
 
+        // UI elements for the gallery
         dom: {
             detail: document.querySelector("#detail"),
             gallery: document.querySelector("#gallery"),
@@ -51,13 +57,16 @@
             types: document.querySelector("#types"),
         },
 
+        // enable it with attributes and the DOM property
         enableBtn: btn => {
             btn.removeAttribute("disabled");
             btn.disabled = false;
         },
 
+        // get the value of an element
         formValue: elem => elem.value,
 
+        // show or hide the detail pane (rebuilds it each time)
         toggleDetail: async (on, target) => {
 
             domCtx.dom.detail.innerHTML = "";
@@ -78,6 +87,7 @@
 
                 var spaceLoc = domCtx.createElement("span", " ");
 
+                // if we have a location, we can link to the WWT. Right Ascension always implies Dec.
                 if (target.ra && target.ra.degrees) {
                     const ra = `RA: ${target.ra.hour}h ${target.ra.minute}m ${target.ra.second}s `;
                     const raIdx = target.ra.hour + (target.ra.minute / 60) + (target.ra.second / 3600);
@@ -91,10 +101,18 @@
                 const a = target.aperture;
                 const fstop = f / a;
 
+                // f-stop measures light gathering ability. The lower the number, the better. It makes sense that a bigger aperture
+                // (the opening of the lens) lets in more light. So, a 200mm lens with a 50mm aperture is f/4. A 200mm lens with a  
+                // 20mm aperture is f/10. The f-stop is the ratio of the focal length to the aperture. So, f/4 is 200/50 and f/10 is 200/20.
                 const p = domCtx.createElement("p", `Focal length: ${f}mm Aperture: ${a}mm F/stop: ${fstop}`);
 
                 let emptyOrExposure = domCtx.createElement("span", "");
 
+                // the light required for a good space photograph is more than a typical exposure can handle. The problem is that the earth
+                // rotates while filming, so the stars will move and "streak" or cause "star trails." A mount designed to track the stars is
+                // helpful, but also limited. It is also possible to over expose and oversaturate the image. So, we need to take multiple
+                // exposures and combine them. This is called "stacking." The exposure is the amount of time the shutter is open. The longer
+                // it is open, the more light is let in. The more light, the more detail. 
                 if (target.exposure) {
                     const e = target.exposure;
                     const l = target.lights;
@@ -107,6 +125,7 @@
                     emptyOrExposure = domCtx.createElement("p", `Exposure: ${e}s Subs: ${l} Total exposure: ${duration}`);
                 }
 
+                // what super secret location was this taken at? We can't tell you, but we can show you on a map.
                 const checkLocation = domCtx.createElement(
                     "button",
                     "Observation location");
@@ -115,6 +134,7 @@
                     checkLocation,
                     () => galleryCtx.checkLocation());
 
+                // then you put it all together...
                 const content = domCtx.createElement("div",
                     [
                         domCtx.createElement("h3", finalDate.substring(0, 10)),
@@ -130,8 +150,10 @@
             }
         },
 
+        // simple enough
         updateText: (elem, text) => elem.textContent = text,
 
+        // set up all UI interactions
         init: () => {
 
             domCtx.bindClick(domCtx.login.button, () => {
@@ -165,6 +187,7 @@
             });
         },
 
+        // used to reissue the request when the filters or sorts change
         refresh: () => {
 
             domCtx.dom.gallery.innerHTML = "";
@@ -222,6 +245,7 @@
             });
         },
 
+        // helps with the filters by setting the current value
         set: (property, val) => {
                 
             const old = document.querySelector(`#${property} button.current`);
@@ -242,10 +266,13 @@
             });
         },
 
+        // set the type of image
         setType: val => domCtx.set("types", val),
 
+        // set the telescope that was used
         setScope: val => domCtx.set("telescopes", val),
 
+        // bind a list of options to a parent container
         bind: (list, container, callback) => {
 
             for (let idx = 0; idx < list.length; idx++) {
@@ -260,18 +287,23 @@
             }
         },
 
+        // misc. status
         updateStatus: msg => domCtx.dom.status.textContent = msg,
 
+        // loading indicator
         updateLoading: () =>
             domCtx.dom.loading.style.display = galleryCtx.loadingReq ? "block" : "none",
     };
 
     const galleryCtx = {
 
+        // current detail
         target: {},
 
+        // true when a request is in flight
         loadingReq: false,
-
+    
+        // toggle loading state. Use a delay for fast results so it doesn't "flicker."
         inflightRequest: set => {
             if (set && galleryCtx.loadingReq) {
                 return false;
@@ -281,8 +313,10 @@
             return true;
         },
 
+        // is there a location?
         checkLocation: async () => {
 
+            // avoid stacked requests
             if (!galleryCtx.inflightRequest(true)) {
                 return;
             }
@@ -312,11 +346,14 @@
             galleryCtx.inflightRequest(false);
         },
 
+
         login: async (username, password) => {
 
             if (!galleryCtx.inflightRequest(true)) {
                 return;
             }
+
+            // me like cookie (they "just work")
             await fetch('/identity/login?cookieMode=true', {
                 method: 'POST',
                 headers: {
@@ -357,6 +394,7 @@
             }
         },
 
+        // keep track for paging
         pageInfo: {
             currentPage: 0,
             pageSize: pageSizeIsAlways,
@@ -364,6 +402,7 @@
             totalItems: 0
         },
 
+        // types of images
         types: [],
         type: null,
 
@@ -381,6 +420,7 @@
             await galleryCtx.refresh();
         },
 
+        // reload those queries
         refresh: async () => {
 
             if (!galleryCtx.inflightRequest(true)) {
@@ -413,6 +453,7 @@
             }
         },
 
+        // sort it out
         toggle: column => {
             if (galleryCtx.sort === column) {
                 galleryCtx.sortDesc = !galleryCtx.sortDesc;
@@ -424,8 +465,6 @@
 
         telescopes: [],
         telescope: null,
-
-        asyncCount: 0,
 
         sort: "date",
         sortDesc: true,
