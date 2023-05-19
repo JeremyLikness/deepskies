@@ -346,7 +346,6 @@
             galleryCtx.inflightRequest(false);
         },
 
-
         login: async (username, password) => {
 
             if (!galleryCtx.inflightRequest(true)) {
