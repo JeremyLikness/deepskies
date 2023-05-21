@@ -13,6 +13,7 @@ connection.Open();
 builder.Services.AddAuthorization();
 
 builder.Services.AddDbContext<DeepSkyUserContext>(opt => opt.UseSqlite(connection));
+
 builder.Services.AddIdentityApiEndpoints<IdentityUser>()
     .AddEntityFrameworkStores<DeepSkyUserContext>();
 
@@ -28,8 +29,8 @@ app.UseStaticFiles();
 
 app.MapGet("/hello", () => "world");
 app.MapGroup("/data").MapDeepSkyData();
-
 app.MapGroup("/personaldata").MapDeepSkyPersonalData();
+
 app.MapGroup("/identity").MapIdentityApi<IdentityUser>();
 
 app.Run();

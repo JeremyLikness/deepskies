@@ -1,5 +1,6 @@
 ﻿@DeepSkies.Web_HostAddress = https://localhost:7092
 
+# Simple request
 GET {{DeepSkies.Web_HostAddress}}/hello
 
 ###
@@ -20,21 +21,24 @@ GET {{DeepSkies.Web_HostAddress}}/data/targets/Nebula/Svbony sv503 70ED/20/0
 
 ###
 
+# This will fail due to the lack of an authorization token
 GET {{DeepSkies.Web_HostAddress}}/personaldata/observation/m13-florissant
 
-###
+### Register
 
+# This will fail the password validation. Add ! to the end to make it work.
 POST {{DeepSkies.Web_HostAddress}}/identity/register
 Content-Encoding: UTF-8
 Content-Type: application/json
 
 {
   "username": "jeliknes",
-  "password": "S3cr3tBu1ldP455w0rd!"
+  "password": "S3cr3tBu1ldP455w0rd"
 }
 
-###
+### Login
 
+# Receives a token that can be used for authorization
 POST {{DeepSkies.Web_HostAddress}}/identity/login
 # @name tokenRequest
 Content-Encoding: UTF-8
@@ -46,7 +50,8 @@ Content-Type: application/json
 }
 
 ### Get private location
-@accessToken = getThisFromPreviousCAllWithoutQuotes
+# Past the token without the quotes
+@accessToken = pasteItHere
 # @name privateLocation
 GET {{DeepSkies.Web_HostAddress}}/personaldata/observation/rho
 Authorization: Bearer {{accessToken}}

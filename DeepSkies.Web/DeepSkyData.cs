@@ -15,7 +15,8 @@ namespace DeepSkies.Web
             endpoints.MapGet("/types", GetTypesAsync);
             endpoints.MapGet("/telescopes", GetTelescopesAsync);
             endpoints.MapGet("target/{folder}", GetTargetAsync);          
-                        
+                  
+            // add /{target:Exhibit} and uncomment the parameter below to see analyzer example
             endpoints.MapGet("/targets/{type}/{telescope}/{limit:int}/{page:int}",
                 async (DeepSkyContext ctx,
                 string type,
@@ -23,7 +24,9 @@ namespace DeepSkies.Web
                 int limit,
                 int page,
                 [FromQuery] string? sort,
-                [FromQuery] bool? descending) =>
+                [FromQuery] bool? descending
+                //,Exhibit target
+                ) =>
                 {
                     if (limit < 1)
                     {
